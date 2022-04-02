@@ -1,25 +1,32 @@
-import logo from './logo.svg';
 import './App.css';
+import Timer from './Timer';
+import { useEffect, useState } from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const DURATION = 120;
+
+const App = () => {
+  const [seconds, setSeconds] = useState(DURATION)
+  const [start, setStart] = useState()
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (!start) {
+        return;
+      }
+
+      const secondsPassed = Math.floor((Date.now() - start) / 1000);
+      setSeconds(DURATION - (secondsPassed % DURATION) - 1);
+    }, 300);
+    return () => clearInterval(id);
+  }, [start]);
+
+  return (<div className="App">
+    <Timer seconds={seconds}/>
+    <button onClick={() => {
+      setSeconds(DURATION)
+      setStart(Date.now())
+    }}>start</button>
+  </div>);
+};
 
 export default App;
