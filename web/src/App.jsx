@@ -1,5 +1,7 @@
 import './App.css';
-import alarm from './static/alarm.wav';
+import alarm1 from './static/alarm1.wav';
+import alarm2 from './static/alarm2.wav';
+import alarm3 from './static/alarm3.wav';
 import { useEffect, useState } from 'react';
 import Timer from './Timer';
 import Header from './Header';
@@ -11,7 +13,7 @@ const DURATION = 120;
 const App = () => {
   const [seconds, setSeconds] = useState(DURATION);
   const [start, setStart] = useState();
-  const [audio] = useState(new Audio(alarm));
+  const [audio] = useState([new Audio(alarm1), new Audio(alarm2), new Audio(alarm3)]);
   const [water, setWater] = useState(true);
   const [volume, setVolume] = useState(50);
 
@@ -37,13 +39,22 @@ const App = () => {
   }, [start]);
 
   useEffect(() => {
-    if (seconds === 20 || seconds === 10) {
-      audio.play();
+    if (seconds === 20) {
+      audio[2].play();
+    }
+    if(seconds === 10) {
+      audio[1].play();
+    }
+    if(seconds === 0) {
+      audio[0].play();
     }
   }, [seconds, audio]);
 
   useEffect(() => {
-    audio.volume = volume / 100;
+    const newVolume = volume / 100;
+    audio[0].volume = newVolume;
+    audio[1].volume = newVolume;
+    audio[2].volume = newVolume;
   }, [volume, audio]);
 
   const startTimer = () => {
