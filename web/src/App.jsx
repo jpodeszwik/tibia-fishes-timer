@@ -16,13 +16,20 @@ const App = () => {
   const [volume, setVolume] = useState(50);
 
   useEffect(() => {
+    /* eslint no-restricted-globals: "off" */
+    const hash = parent.location.hash;
+    if (hash) {
+      setStart(parseInt(hash.replace('#', '')));
+    }
+  }, []);
+
+  useEffect(() => {
     const id = setInterval(() => {
       if (!start) {
         return;
       }
       const secondsPassed = Math.floor((Date.now() - start) / 1000);
       const cyclesPassed = Math.floor(secondsPassed / DURATION);
-      console.log(cyclesPassed % 2 == 0);
       setWater(cyclesPassed % 2 == 0);
       setSeconds(DURATION - (secondsPassed % DURATION) - 1);
     }, 100);
@@ -41,7 +48,10 @@ const App = () => {
 
   const startTimer = () => {
     setSeconds(DURATION);
-    setStart(Date.now() - 10 * DURATION * 1000);
+    const newStart = Date.now() - 10 * DURATION * 1000;
+    setStart(newStart);
+    /* eslint no-restricted-globals: "off" */
+    parent.location.hash = newStart;
   };
 
   const stopTimer = () => {
