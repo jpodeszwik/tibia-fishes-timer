@@ -71,7 +71,9 @@ const App = () => {
   };
 
   const addSeconds = (seconds) => {
-    setStart(start + (seconds * 1000));
+    const newStart = start + (seconds * 1000);
+    setStart(newStart);
+    parent.location.hash = newStart;
   };
 
   return (<div className="App">
