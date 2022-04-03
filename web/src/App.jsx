@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Timer from './Timer';
 import Header from './Header';
 import WaterStatus from './WaterStatus';
+import VolumeBar from './VolumeBar';
 
 const DURATION = 120;
 
@@ -12,6 +13,7 @@ const App = () => {
   const [start, setStart] = useState();
   const [audio] = useState(new Audio(alarm));
   const [water, setWater] = useState(true);
+  const [volume, setVolume] = useState(50);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -31,7 +33,11 @@ const App = () => {
     if (seconds === 20 || seconds === 10) {
       audio.play();
     }
-  }, [seconds]);
+  }, [seconds, audio]);
+
+  useEffect(() => {
+    audio.volume = volume / 100;
+  }, [volume, audio]);
 
   const startTimer = () => {
     setSeconds(DURATION);
@@ -50,15 +56,15 @@ const App = () => {
   return (<div className="App">
     <Header/>
     <div className="button-bar">
-      <button onClick={startTimer}>start</button>
+      <button disabled={!!start} onClick={startTimer}>start</button>
       <button disabled={!start} onClick={stopTimer}>stop</button>
       <button disabled={!start} onClick={() => addSeconds(1)}>+1s</button>
       <button disabled={!start} onClick={() => addSeconds(-1)}>-1s</button>
       <button disabled={!start} onClick={() => addSeconds(-120)}>-120s</button>
     </div>
-
+    <VolumeBar onChange={setVolume} />
     <Timer seconds={seconds}/>
-    <WaterStatus status={water}/>
+    {start && <WaterStatus status={water}/>}
   </div>);
 };
 
