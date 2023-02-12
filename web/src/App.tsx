@@ -1,21 +1,22 @@
 import './App.css';
-import alarm1 from './static/alarm1.wav';
-import alarm2 from './static/alarm2.wav';
-import alarm3 from './static/alarm3.wav';
 import { useEffect, useState } from 'react';
 import Timer from './Timer';
 import Header from './Header';
 import WaterStatus from './WaterStatus';
 import VolumeBar from './VolumeBar';
+import React from 'react';
+
+const alarm1 = require('./static/alarm1.wav') as string;
+const alarm2 = require('./static/alarm2.wav') as string;
+const alarm3 = require('./static/alarm3.wav') as string;
 
 const DURATION = 120;
 
-const useAudio = url => {
+const useAudio = (url: string) => {
   const [audio] = useState(() => new Audio(url));
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    console.log('useEffect');
     audio.currentTime = 0;
     playing ? audio.play() : audio.pause();
   }, [playing, audio]);
@@ -30,27 +31,27 @@ const useAudio = url => {
   return {
     play: () => setPlaying(true),
     stop: () => setPlaying(false),
-    setVolume: volume => audio.volume = volume,
+    setVolume: (volume: number) => audio.volume = volume,
   };
 };
 
-const useAudios = urls => {
+const useAudios = (urls: Array<string>) => {
   const audios = urls.map(useAudio);
 
   return {
-    play: num => {
+    play: (num: number) => {
       audios.forEach(a => a.stop());
       audios[num].play();
     },
-    setVolume: volume => audios.forEach(a => a.setVolume(volume)),
+    setVolume: (volume: number) => audios.forEach(a => a.setVolume(volume)),
   }
 };
 
 const App = () => {
   const audios = useAudios([alarm1, alarm2, alarm3]);
-  const [secondsElapsed, setSecondsElapsed] = useState();
-  const [start, setStart] = useState();
-  const [volume, setVolume] = useState();
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const [start, setStart] = useState(0);
+  const [volume, setVolume] = useState(0);
 
   const cyclesPassed = secondsElapsed ? Math.floor(secondsElapsed / DURATION) : 0;
   const water = cyclesPassed % 2 === 0;
@@ -87,29 +88,27 @@ const App = () => {
   }, [seconds, audios]);
 
   useEffect(() => {
-    if (volume) {
-      audios.setVolume(volume / 100);
-    }
+    audios.setVolume(volume / 100);
   }, [volume, audios]);
 
   const startTimer = () => {
     const newStart = Date.now() - 10 * DURATION * 1000;
     setStart(newStart);
     /* eslint no-restricted-globals: "off" */
-    parent.location.hash = newStart;
+    parent.location.hash = String(newStart);
   };
 
   const stopTimer = () => {
-    setStart(null);
+    setStart(0);
     /* eslint no-restricted-globals: "off" */
     parent.location.hash = '';
   };
 
-  const addSeconds = (seconds) => {
+  const addSeconds = (seconds: number) => {
     const newStart = start + (seconds * 1000);
     setStart(newStart);
     /* eslint no-restricted-globals: "off" */
-    parent.location.hash = newStart;
+    parent.location.hash = String(newStart);
   };
 
   return (<div className="App">
@@ -123,7 +122,7 @@ const App = () => {
     </div>
     <VolumeBar onChange={setVolume} />
     <Timer seconds={seconds} />
-    {start && <WaterStatus status={water} />}
+    <WaterStatus status={water} />
   </div>);
 };
 
